@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Beer Recipe",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the beer recipe."
+    },
+    "style": {
+      "type": "string",
+      "description": "The beer style (e.g., Lager, IPA, Stout)."
+    },
+    "batch_size_liters": {
+      "type": "number",
+      "description": "The batch size in liters."
+    },
+    "ingredients": {
+      "type": "object",
+      "properties": {
+        "grains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "amount_kg": { "type": "number" },
+              "description": {
+                "type": "string",
+                "description": "Additional details about the grain (optional)."
+              }
+            },
+            "required": ["name", "amount_kg"]
+          }
+        },
+        "hops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "amount_g": { "type": "number" },
+              "time_minutes": { "type": "integer" },
+              "usage": {
+                "type": "string",
+                "enum": ["Boil", "Dry Hop", "Whirlpool"],
+                "description": "Indicates how hops are used in the recipe."
+              }
+            },
+            "required": ["name", "amount_g", "time_minutes", "usage"]
+          }
+        },
+        "yeast": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "amount_packages": { "type": "number" },
+            "temperature_celsius": { "type": "number" },
+            "notes": {
+              "type": "string",
+              "description": "Any specific notes about the yeast (optional)."
+            }
+          },
+          "required": ["name", "amount_packages", "temperature_celsius"]
+        },
+        "water": {
+          "type": "object",
+          "properties": {
+            "strike_water_liters": { "type": "number" },
+            "sparge_water_liters": { "type": "number" }
+          },
+          "required": ["strike_water_liters", "sparge_water_liters"]
+        },
+        "additional": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "amount": { "type": "number" },
+              "unit": { "type": "string" },
+              "notes": { "type": "string" }
+            },
+            "required": ["name", "amount", "unit"]
+          },
+          "description": "Any other additional ingredients (optional)."
+        }
+      },
+      "required": ["grains", "hops", "yeast", "water"]
+    },
+    "equipment": {
+      "type": "object",
+      "properties": {
+        "mash_tun": { "type": "boolean" },
+        "boil_kettle": { "type": "boolean" },
+        "fermenter": { "type": "string" },
+        "wort_chiller": { "type": "boolean" },
+        "airlock": { "type": "boolean" }
+      },
+      "required": ["mash_tun", "boil_kettle", "fermenter", "wort_chiller", "airlock"]
+    },
+    "process": {
+      "type": "object",
+      "properties": {
+        "mash": {
+          "type": "object",
+          "properties": {
+            "temperature_celsius": { "type": "number" },
+            "time_minutes": { "type": "integer" }
+          },
+          "required": ["temperature_celsius", "time_minutes"]
+        },
+        "sparge": {
+          "type": "object",
+          "properties": {
+            "temperature_celsius": { "type": "number" },
+            "time_minutes": { "type": "integer" }
+          },
+          "required": ["temperature_celsius", "time_minutes"]
+        },
+        "boil": {
+          "type": "object",
+          "properties": {
+            "duration_minutes": { "type": "integer" },
+            "notes": { "type": "string" }
+          },
+          "required": ["duration_minutes"]
+        },
+        "cooling": {
+          "type": "object",
+          "properties": {
+            "method": { "type": "string" },
+            "target_temperature_celsius": { "type": "number" }
+          },
+          "required": ["method", "target_temperature_celsius"]
+        },
+        "fermentation": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "type": "object",
+              "properties": {
+                "duration_days": { "type": "integer" },
+                "temperature_celsius": { "type": "number" }
+              },
+              "required": ["duration_days", "temperature_celsius"]
+            },
+            "diacetyl_rest": {
+              "type": "object",
+              "properties": {
+                "duration_days": { "type": "integer" },
+                "temperature_celsius": { "type": "number" }
+              },
+              "description": "Optional diacetyl rest step.",
+              "required": ["duration_days", "temperature_celsius"]
+            },
+            "lagering": {
+              "type": "object",
+              "properties": {
+                "duration_weeks": { "type": "integer" },
+                "temperature_celsius": { "type": "number" }
+              },
+              "description": "Optional lagering step.",
+              "required": ["duration_weeks", "temperature_celsius"]
+            }
+          },
+          "required": ["primary"]
+        },
+        "bottling": {
+          "type": "object",
+          "properties": {
+            "priming_sugar_g": { "type": "number" },
+            "bottle_conditioning_days": { "type": "integer" },
+            "target_co2_volumes": { "type": "number" }
+          },
+          "required": ["priming_sugar_g", "bottle_conditioning_days", "target_co2_volumes"]
+        }
+      },
+      "required": ["mash", "sparge", "boil", "cooling", "fermentation", "bottling"]
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional additional notes for the recipe."
+    }
+  },
+  "required": ["name", "style", "batch_size_liters", "ingredients", "equipment", "process"]
+}
