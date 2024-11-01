@@ -1,1 +1,7 @@
-{}
+{
+  "functions": {
+    "app/actions.tsx": {
+      "maxDuration": 20
+    }
+  }
+}
