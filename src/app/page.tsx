@@ -4,7 +4,8 @@ import { IoBeerOutline } from "react-icons/io5";
 import { GiHops } from "react-icons/gi";
 import { useState, useTransition, useEffect, useRef } from 'react';
 import { sendChat } from './actions';
-import Markdown from 'react-markdown';
+import RecipeDisplay from './recipeDisplay';
+import { Recipe } from './types'; // Adjust the path if necessary
 
 // Brewing steps for the loading message
 const brewingSteps = [
@@ -25,7 +26,7 @@ const brewingSteps = [
 export default function Home() {
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
-  const [recipe, setRecipe] = useState<string | null>(null);
+  const [recipe, setRecipe] = useState<Recipe | null>(null); // Updated recipe type
   const [loadingStep, setLoadingStep] = useState(0); // Current brewing step index
 
   // Create a reference for smooth scrolling to the recipe section
@@ -34,9 +35,25 @@ export default function Home() {
   const handleSubmit = async () => {
     startTransition(async () => {
       const result = await sendChat(description);
-      setRecipe(result);
+      
+      if (result) {
+        try {
+          // Remove any Markdown code block markers (e.g., ```json and ```)
+          const cleanedResult = result.replace(/```(?:json)?\n?|\n?```/g, '');
+          
+          const parsedRecipe: Recipe = JSON.parse(cleanedResult); // Parse the cleaned result
+          setRecipe(parsedRecipe);
+        } catch (error) {
+          console.error("Failed to parse recipe:", error);
+          setRecipe(null);
+        }
+      } else {
+        console.error("No recipe data received");
+        setRecipe(null);
+      }
     });
   };
+  
 
   // Smooth scroll to the recipe section when a new recipe is loaded
   useEffect(() => {
@@ -70,7 +87,10 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center p-8 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 w-full max-w-screen-md">
-        <p className="text-5xl text-center sm:text-left">sl<b>ai</b>nte</p>
+      <p className="text-5xl text-center sm:text-left flex items-baseline">
+        sl<b>ái</b>nte
+        <span className="text-sm text-gray-500 ml-4">(slawn-che)</span>
+      </p>
 
         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li>Describe your desired beverage.</li>
@@ -101,11 +121,11 @@ export default function Home() {
         </div>
 
         {/* Recipe content with extra top margin */}
-        <div className="w-full max-w-lg min-h-[200px] mt-10" ref={recipeRef}>
-          <p className="text-3xl sm:text-2xl font-semibold">
-            {recipe ? "Recipe:" : ""}
-          </p>
-          <Markdown className="text-sm sm:text-base">{recipe}</Markdown>
+        <div className="w-full max-w-lg min-h-[200px] mt-10 pt-10" ref={recipeRef}>
+          {recipe && (
+            <p className="text-4xl font-bold text-teal-500 mb-6">Recipe:</p>
+          )}
+          {recipe && <RecipeDisplay recipe={recipe} />}
         </div>
       </main>
 
